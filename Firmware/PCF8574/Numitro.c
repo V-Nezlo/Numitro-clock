@@ -77,6 +77,11 @@
 #define NUM9a 0b00001000
 #define NUM0a 0b00000010
 
+#define CHAR1 0b11000011 // Ч
+#define CHAR2 0b11000000 // А
+#define CHAR3 0b11110111 // С
+#define CHAR4 0b11111111 // Ы
+
 struct Alarm {uint8_t hour, min, sec; char state, flag ;} alarm1;
 struct TimeFlags {char incminflag, inchourflag;} timef, alarm1f; 
 
@@ -534,6 +539,29 @@ void debug_signal()
 		_delay_ms(100);
 }
 
+void initial_show()
+{
+	I2C_StartCondition();
+	I2C_SendByte(DIGIADR1);
+	I2C_SendByte(CHAR1);
+	I2C_StopCondition();
+
+	I2C_StartCondition();
+	I2C_SendByte(DIGIADR2);
+	I2C_SendByte(CHAR2);
+	I2C_StopCondition();
+
+	I2C_StartCondition();
+	I2C_SendByte(DIGIADR3);
+	I2C_SendByte(CHAR3);
+	I2C_StopCondition();
+
+	I2C_StartCondition();
+	I2C_SendByte(DIGIADR4);
+	I2C_SendByte(CHAR4);
+	I2C_StopCondition();
+}
+
 int main(void)
 {
 	EICRA = 0b00001010;//INT1&0 в режиме нисходящего фронта
@@ -574,11 +602,15 @@ int main(void)
 	TIMSK0 |= (1<<OCIE0A);
 	//timer0
 	
+	cli();
 	I2C_Init(); //Включить I2C
 	_delay_ms(100);//
 	if ((!(PIND&0b11000000))) RTC_Set();//Если зажать при старте 2 кнопки то произойдет первичная запись в RTC
 	alarm1.flag = RTC_CheckAlarm();//Проверить при включении, включен ли таймер в RTC
 	check_flags(); // Обработчик флагов
+	_delay_ms(100);
+	initial_show();
+	_delay_ms(1000);
 	sei(); //Вперед, прерывания
 	
     while(1)
