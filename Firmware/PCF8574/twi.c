@@ -41,7 +41,7 @@ unsigned char I2C_ReadByte(void)
 
 unsigned char I2C_ReadLastByte(void)
 {
-	TWCR = (1<<TWINT)|(1<<TWEN)//А вот тут нет экноледжа
+	TWCR = (1<<TWINT)|(1<<TWEN);//А вот тут нет экноледжа
 	while (!(TWCR & (1<<TWINT)));
 	return TWDR;
 }

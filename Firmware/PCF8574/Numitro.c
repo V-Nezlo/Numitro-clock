@@ -78,9 +78,9 @@
 #define NUM0a 0b00000010
 
 #define CHAR1 0b11000011 // Ч
-#define CHAR2 0b11000000 // А
-#define CHAR3 0b11110111 // С
-#define CHAR4 0b11111111 // Ы
+#define CHAR2 0b10000010 // А
+#define CHAR3 0b00110010 // С
+#define CHAR4 0b10010000 // Ы
 
 struct Alarm {uint8_t hour, min, sec; char state, flag ;} alarm1;
 struct TimeFlags {char incminflag, inchourflag;} timef, alarm1f; 
@@ -602,15 +602,16 @@ int main(void)
 	TIMSK0 |= (1<<OCIE0A);
 	//timer0
 	
-	cli();
+	cli(); //А вот так надо да
 	I2C_Init(); //Включить I2C
 	_delay_ms(100);//
 	if ((!(PIND&0b11000000))) RTC_Set();//Если зажать при старте 2 кнопки то произойдет первичная запись в RTC
+	alarm_reset(); //Сбросить флаг прерывания при включении, чтобы не заорало
 	alarm1.flag = RTC_CheckAlarm();//Проверить при включении, включен ли таймер в RTC
-	check_flags(); // Обработчик флагов
+	check_flags(); //Обработчик флагов
 	_delay_ms(100);
 	initial_show();
-	_delay_ms(1000);
+	_delay_ms(5000);
 	sei(); //Вперед, прерывания
 	
     while(1)
